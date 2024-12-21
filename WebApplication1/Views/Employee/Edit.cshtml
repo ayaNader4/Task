@@ -1,0 +1,89 @@
+﻿@model WebApplication1.Models.Employee
+
+@{
+    ViewData["Title"] = "Edit";
+    SelectList department = new SelectList(ViewBag.Department, "Id", "Name");
+
+}
+
+<h1>Edit</h1>
+
+<h4>Employee</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="employeeForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label" hidden></label>
+                <input asp-for="Id" class="form-control" hidden/>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="salary" class="control-label"></label>
+                <input asp-for="salary" class="form-control" />
+                <span asp-validation-for="salary" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="DepartmentId" class="control-label"></label>
+                    <select asp-items="department"
+                            asp-for="DepartmentId">
+                        <option value="@Model.DepartmentId">
+                            --Select Department--
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+        <div id="responseMessage"></div>
+
+    </div>
+</div>
+
+<div>
+    <a asp-action="GetAll">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#employeeForm').submit(function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var EmployeeData = {
+                    Id: parseInt($('#Id').val()),
+                    Name: $('#Name').val(),
+                    salary: parseFloat($('#salary').val()),
+                    DepartmentId: parseInt($('#DepartmentId').val())
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Edit", "Employee")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(EmployeeData),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#responseMessage').html('<span class="text-success">' + response.message + '</span>');
+                        } else {
+                            $('#responseMessage').html('<span class="text-danger">' + response.message + '</span>');
+                        }
+                    },
+                    error: function (xhr) {
+                        $('#responseMessage').html('<span class="text-danger">Error: ' + xhr.responseText + '</span>');
+                    }
+                });
+            });
+        });
+    </script>
+}

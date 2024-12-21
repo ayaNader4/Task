@@ -1,0 +1,71 @@
+﻿@model WebApplication1.Models.Department
+
+@{
+    ViewData["Title"] = "Add";
+}
+
+<h1>Add</h1>
+
+<h4>Department</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form id="departmentForm" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="budget" class="control-label"></label>
+                <input asp-for="budget" class="form-control" />
+                <span asp-validation-for="budget" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+        <div id="responseMessage"></div>
+
+    </div>
+</div>
+
+<div>
+    <a asp-action="GetAll">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#departmentForm').submit(function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var departmentData = {
+                    Name: $('#Name').val(),
+                    budget: parseFloat($('#budget').val())  // Ensure that Budget is in the correct format
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Add", "Department")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(departmentData),
+                    success: function (response) {
+                        if (response.success) {
+                            $('#responseMessage').html('<span class="text-success">' + response.message + '</span>');
+                        } else {
+                            $('#responseMessage').html('<span class="text-danger">' + response.message + '</span>');
+                        }
+                    },
+                    error: function (xhr) {
+                        $('#responseMessage').html('<span class="text-danger">Error: ' + xhr.responseText + '</span>');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
